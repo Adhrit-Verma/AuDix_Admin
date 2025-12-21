@@ -1,0 +1,585 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AuDiX Admin Dashboard</title>
+  <style>
+    body {
+      font-family: system-ui, Arial;
+      margin: 0;
+      background: #f7f7f7;
+    }
+
+    header {
+      background: #111;
+      color: #fff;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .wrap {
+      padding: 14px 16px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .k {
+      color: #666;
+      font-size: 13px;
+    }
+
+    .v {
+      font-size: 22px;
+      font-weight: 700;
+      margin-top: 6px;
+    }
+
+    button {
+      border: 0;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .btn {
+      background: #fff;
+      border: 1px solid #444;
+      color: #111;
+    }
+
+    .btnPrimary {
+      background: #111;
+      color: #fff;
+    }
+
+    .btnDanger {
+      background: #7f1d1d;
+      color: #fff;
+    }
+
+    .btnWarn {
+      background: #92400e;
+      color: #fff;
+    }
+
+    .btnGhost {
+      background: transparent;
+      border: 1px solid #ddd;
+      color: #111;
+    }
+
+    .small {
+      color: #777;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    pre {
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 14px;
+      padding: 12px;
+      overflow: auto;
+    }
+
+    .bar {
+      height: 10px;
+      background: #eee;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .fill {
+      height: 100%;
+      width: 0%;
+      background: #111;
+      border-radius: 999px;
+      transition: width 400ms ease;
+    }
+
+    .alert-warn {
+      color: #b45309;
+    }
+
+    .alert-crit {
+      color: #b91c1c;
+    }
+
+    /* Status banner */
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .status.ok {
+      background: #e7f7ee;
+      color: #065f46;
+    }
+
+    .status.warn {
+      background: #fff7ed;
+      color: #92400e;
+    }
+
+    .status.crit {
+      background: #fee2e2;
+      color: #7f1d1d;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin: 14px 0;
+      flex-wrap: wrap;
+    }
+
+    .tabBtn {
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid #ddd;
+      background: #fff;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .tabBtn.active {
+      background: #111;
+      color: #fff;
+      border-color: #111;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    /* Tables */
+    .panel {
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .row>* {
+      flex: 0 0 auto;
+    }
+
+    input,
+    select {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    th {
+      color: #555;
+      font-size: 12px;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid #ddd;
+    }
+
+    .pill.pending {
+      background: #fff7ed;
+      color: #92400e;
+      border-color: #fed7aa;
+    }
+
+    .pill.approved {
+      background: #e7f7ee;
+      color: #065f46;
+      border-color: #a7f3d0;
+    }
+
+    .pill.rejected {
+      background: #fee2e2;
+      color: #7f1d1d;
+      border-color: #fecaca;
+    }
+
+    .pill.disabled {
+      background: #f3f4f6;
+      color: #111827;
+      border-color: #e5e7eb;
+    }
+
+    .pill.active {
+      background: #e7f7ee;
+      color: #065f46;
+      border-color: #a7f3d0;
+    }
+
+    .msg {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #444;
+    }
+
+    .msg.err {
+      color: #7f1d1d;
+      font-weight: 700;
+    }
+
+    .codeBox {
+      margin-top: 10px;
+      padding: 12px;
+      border: 1px dashed #ddd;
+      border-radius: 12px;
+      background: #fafafa;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      display: none;
+    }
+
+    .codeBox.show {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div style="font-weight:800;">AuDiX Admin</div>
+    <form method="POST" action="/admin/logout">
+      <button class="btn" type="submit">Logout</button>
+    </form>
+  </header>
+
+  <div id="statusBanner" class="status ok">
+    <span id="statusIcon">✅</span>
+    <span id="statusText">SYSTEM OK</span>
+  </div>
+
+  <div class="wrap">
+    <div class="tabs">
+      <button class="tabBtn active" data-tab="monitor">Monitor</button>
+      <button class="tabBtn" data-tab="live">Live</button>
+      <button class="tabBtn" data-tab="requests">Requests</button>
+      <button class="tabBtn" data-tab="flats">Flats</button>
+      <button class="tabBtn" data-tab="db">Database</button>
+
+    </div>
+
+    <!-- MONITOR -->
+    <section id="tab-monitor" class="section active">
+      <div class="grid">
+        <div class="card">
+          <div class="k">Uptime (sec)</div>
+          <div class="v" id="uptime">-</div>
+        </div>
+        <div class="card">
+          <div class="k">Requests (total)</div>
+          <div class="v" id="totalRequests">-</div>
+        </div>
+        <div class="card">
+          <div class="k">Requests (last 60s)</div>
+          <div class="v" id="rpm">-</div>
+        </div>
+        <div class="card">
+          <div class="k">In-flight requests</div>
+          <div class="v" id="inFlight">-</div>
+        </div>
+        <div class="card">
+          <div class="k">Unique IPs seen</div>
+          <div class="v" id="uniqueIPs">-</div>
+        </div>
+        <div class="card">
+          <div class="k">Dashboard viewers</div>
+          <div class="v" id="viewers">-</div>
+        </div>
+
+        <div class="card">
+          <div class="k">CPU pressure</div>
+          <div class="v" id="cpuText">-</div>
+          <div class="bar">
+            <div class="fill" id="cpuBar"></div>
+          </div>
+          <div class="small" id="cpuAlert"></div>
+        </div>
+
+        <div class="card">
+          <div class="k">RAM (RSS / system)</div>
+          <div class="v" id="ramText">-</div>
+          <div class="bar">
+            <div class="fill" id="ramBar"></div>
+          </div>
+          <div class="small" id="ramAlert"></div>
+        </div>
+
+        <div class="card">
+          <div class="k">Traffic (requests/min)</div>
+          <div class="v" id="rpmText">-</div>
+          <div class="bar">
+            <div class="fill" id="rpmBar"></div>
+          </div>
+          <div class="small" id="rpmAlert"></div>
+        </div>
+      </div>
+
+      <div class="small">Live updates are pushed every 1 second via WebSocket.</div>
+
+      <h3 style="margin-top:16px;">Memory</h3>
+      <pre id="mem">Loading...</pre>
+    </section>
+
+    <!-- LIVE -->
+    <section id="tab-live" class="section">
+      <div class="panel">
+        <div class="row">
+          <div style="font-weight:800;">Live Activity</div>
+
+          <button class="btn btnPrimary" id="btnLoadLive">Refresh</button>
+
+          <label class="small" style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" id="liveAuto" checked />
+            Auto refresh
+          </label>
+
+          <input id="liveSearch" placeholder="Search flat or IP (e.g. B-705 / 192.168)"
+            style="min-width:260px; flex:1;" />
+
+          <div class="small" id="liveMeta" style="margin-left:auto;">-</div>
+        </div>
+
+        <div class="msg" id="liveMsg"></div>
+
+        <div class="grid" style="margin-top:10px;">
+          <div class="card">
+            <div class="k">Connected clients</div>
+            <div class="v" id="liveClients">-</div>
+          </div>
+          <div class="card">
+            <div class="k">Live stations</div>
+            <div class="v" id="liveStations">-</div>
+          </div>
+          <div class="card">
+            <div class="k">User server uptime</div>
+            <div class="v" id="liveUptime">-</div>
+          </div>
+        </div>
+
+        <h3 style="margin-top:16px;">Broadcasters</h3>
+        <div style="overflow:auto;">
+          <table id="liveStationsTable">
+            <thead>
+              <tr>
+                <th>Broadcaster Flat</th>
+                <th>IP</th>
+                <th>Started</th>
+                <th>Listeners</th>
+                <th>Mic</th>
+                <th>System</th>
+                <th>PTT</th>
+                <th>Speaking</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <h3 style="margin-top:16px;">Clients</h3>
+        <div style="overflow:auto;">
+          <table id="liveClientsTable">
+            <thead>
+              <tr>
+                <th>Flat</th>
+                <th>IP</th>
+                <th>Role</th>
+                <th>Listening To</th>
+                <th>Connected</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- REQUESTS -->
+    <section id="tab-requests" class="section">
+      <div class="panel">
+        <div class="row">
+          <div style="font-weight:800;">Flat Requests</div>
+
+          <select id="reqStatus">
+            <option value="PENDING" selected>PENDING</option>
+            <option value="APPROVED">APPROVED</option>
+            <option value="REJECTED">REJECTED</option>
+          </select>
+
+          <button class="btn btnPrimary" id="btnLoadRequests">Refresh</button>
+
+          <div style="flex:1"></div>
+
+          <button class="btn btnGhost" id="btnNewRequestToggle">+ Add Request</button>
+        </div>
+
+        <div id="newRequestBox" style="display:none; margin-top:12px;">
+          <div class="row">
+            <input id="newFlatId" placeholder="Flat ID (e.g. A-502)" />
+            <input id="newName" placeholder="Name" />
+            <input id="newNote" placeholder="Note (optional)" style="min-width:240px; flex:1;" />
+            <button class="btn btnPrimary" id="btnCreateRequest">Create</button>
+          </div>
+          <div class="msg" id="newReqMsg"></div>
+        </div>
+
+        <table id="reqTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Flat</th>
+              <th>Name</th>
+              <th>Note</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+
+        <div class="msg" id="reqMsg"></div>
+
+      </div>
+    </section>
+
+    <!-- FLATS -->
+    <section id="tab-flats" class="section">
+      <div class="panel">
+        <div class="row">
+          <div style="font-weight:800;">Flats Manager</div>
+          <input id="flatSearch" placeholder="Search flat (e.g. A-502)" />
+          <button class="btn btnPrimary" id="btnSearchFlats">Search</button>
+          <div class="small" style="margin-left:auto;">Tip: Search is case-insensitive</div>
+        </div>
+
+        <table id="flatTable">
+          <thead>
+            <tr>
+              <th>Flat</th>
+              <th>Status</th>
+              <th>Strike</th>
+              <th>Ban</th>
+              <th>Admin Revoke?</th>
+              <th>Last Login</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+
+        <div class="msg" id="flatMsg"></div>
+      </div>
+    </section>
+
+    <section id="tab-db" class="section">
+      <div class="panel">
+        <div class="row">
+          <div style="font-weight:800;">Database Viewer</div>
+
+          <select id="dbTableSelect"></select>
+
+          <button class="btn btnPrimary" id="btnDbLoad">Load</button>
+
+          <div style="flex:1"></div>
+
+          <button class="btn btnGhost" id="btnDbPrev">Prev</button>
+          <button class="btn btnGhost" id="btnDbNext">Next</button>
+          <div class="small" id="dbPageInfo">-</div>
+        </div>
+
+        <div class="msg" id="dbMsg"></div>
+
+        <div style="overflow:auto; margin-top:10px;">
+          <table id="dbTable">
+            <thead>
+              <tr></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div style="margin-top:14px;">
+          <div style="font-weight:800;">Edit / Insert</div>
+          <div class="small">Select a row to edit. Or insert a new row below.</div>
+
+          <div id="dbForm"
+            style="margin-top:10px; display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <button class="btn btnPrimary" id="btnDbSave">Save</button>
+            <button class="btn btnDanger" id="btnDbDelete">Delete</button>
+            <button class="btn" id="btnDbClear">Clear</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="/public/admin.js"></script>
+</body>
+
+</html>
