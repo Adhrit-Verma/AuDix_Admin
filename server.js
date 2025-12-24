@@ -18,8 +18,13 @@ import {
   adminDisableFlat
 } from "./admin_db_pg.js";
 
-await migrate();
-console.log("[DB] Postgres connected");
+try {
+  await migrate();
+  console.log("[DB] Postgres connected");
+} catch (e) {
+  console.error("[DB] migrate/connect failed:", e?.message || e);
+  process.exit(1);
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -73,11 +78,11 @@ app.use((req, res, next) => {
   res.setHeader(
     "Content-Security-Policy",
     "default-src 'self'; " +
-      "script-src 'self'; " +
-      "style-src 'self' 'unsafe-inline'; " +
-      "connect-src 'self' ws: wss:; " +
-      "img-src 'self' data:; " +
-      "font-src 'self' data:;"
+    "script-src 'self'; " +
+    "style-src 'self' 'unsafe-inline'; " +
+    "connect-src 'self' ws: wss:; " +
+    "img-src 'self' data:; " +
+    "font-src 'self' data:;"
   );
   next();
 });
