@@ -1,4 +1,5 @@
 import pg from "pg";
+import fs from "fs";
 const { Pool } = pg;
 
 function normalizeDatabaseUrl(raw) {
@@ -35,11 +36,18 @@ try {
   // ignore
 }
 
+
+const caPath = process.env.PGSSLROOTCERT;
+const ssl =
+  caPath
+    ? { ca: fs.readFileSync(caPath, "utf8"), rejectUnauthorized: true }
+    : { rejectUnauthorized: false }; // fallback
+
 export const pool = new Pool({
   connectionString: DATABASE_URL,
 
   // Supabase requires SSL from hosted environments
-  ssl: { rejectUnauthorized: false },
+  ssl,
 
   // Small pool so free tiers don't choke
   max: Number(process.env.PG_POOL_MAX || 5),
