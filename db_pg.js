@@ -38,10 +38,15 @@ try {
 
 
 const caPath = process.env.PGSSLROOTCERT;
-const ssl =
-  caPath
-    ? { ca: fs.readFileSync(caPath, "utf8"), rejectUnauthorized: true }
-    : { rejectUnauthorized: false }; // fallback
+
+const ssl = caPath
+  ? {
+      ca: fs.readFileSync(caPath, "utf8"),
+      // IMPORTANT: Supabase pooler often trips strict verification on some hosts
+      rejectUnauthorized: false
+    }
+  : { rejectUnauthorized: false };
+
 
 export const pool = new Pool({
   connectionString: DATABASE_URL,
