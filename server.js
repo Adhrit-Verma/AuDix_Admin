@@ -1,13 +1,14 @@
 import "dotenv/config";
 import express from "express";
 import session from "express-session";
+import pgSession from "connect-pg-simple";
 import http from "http";
 import { WebSocketServer } from "ws";
 import path from "path";
 import { fileURLToPath } from "url";
 import os from "os";
 
-import { query, migrate } from "./db_pg.js";
+import { pool, query, migrate } from "./db_pg.js";
 import {
   adminCreateFlatRequest,
   adminListRequests,
@@ -56,19 +57,35 @@ if (!LIVE_TOKEN) {
 
 const app = express();
 const server = http.createServer(app);
+app.set("trust proxy", 1);
 
-// --- sessions ---
+
+// --- sessions (Postgres store for production) ---
+const PgSession = pgSession(session);
+
 const sessionParser = session({
   name: "audix_admin_sid",
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+
+  // ✅ Store sessions in Postgres (Supabase)
+  store: new PgSession({
+    pool,                       // from db_pg.js
+    tableName: "admin_sessions",
+    createTableIfMissing: true,
+  }),
+
   cookie: {
     httpOnly: true,
-    sameSite: "lax"
-  }
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production", // Render = production
+    maxAge: 1000 * 60 * 60 * 24 * 7,               // 7 days
+  },
 });
+
 app.use(sessionParser);
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
