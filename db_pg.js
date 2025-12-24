@@ -1,5 +1,8 @@
 import pg from "pg";
 const { Pool } = pg;
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+console.log("[DB] TLS verify disabled =", process.env.NODE_TLS_REJECT_UNAUTHORIZED);
+
 
 function normalizeDatabaseUrl(raw) {
   if (!raw) throw new Error("Missing DATABASE_URL");
