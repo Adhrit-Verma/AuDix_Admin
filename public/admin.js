@@ -12,9 +12,15 @@
   }
 
   function fmtTime(ms) {
-    if (!ms) return '-';
-    try { return new Date(ms).toLocaleString(); } catch { return String(ms); }
+    if (ms === null || ms === undefined || ms === '' || ms === 0) return '-';
+
+    const n = Number(ms);
+    if (!Number.isFinite(n)) return '-';
+
+    const d = new Date(n);
+    return Number.isNaN(d.getTime()) ? '-' : d.toLocaleString();
   }
+
 
   function fmtBytes(n) {
     if (!Number.isFinite(n)) return '-';
